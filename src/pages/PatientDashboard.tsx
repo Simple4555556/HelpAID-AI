@@ -92,12 +92,14 @@ export default function PatientDashboard({ user }: PatientDashboardProps) {
       sock.emit('user:online', { userId: userIdStr, role: 'user' });
       if (activeCase?._id) {
         sock.emit('track_emergency', activeCase._id);
-        console.log('[PATIENT SOCKET] tracking case:', activeCase._id);
+        sock.emit('join_case_room', { caseId: activeCase._id });
+        console.log('[PATIENT SOCKET] tracking + joined case room:', activeCase._id);
       }
     });
 
     if (activeCase?._id && sock.connected) {
       sock.emit('track_emergency', activeCase._id);
+      sock.emit('join_case_room', { caseId: activeCase._id });
     }
 
     const updateCasesState = (updater: (prevCase: any) => any, targetCaseId?: string) => {
@@ -244,6 +246,34 @@ export default function PatientDashboard({ user }: PatientDashboardProps) {
       }), data.caseId);
       refreshNotifications();
     });
+
+    // 7. Canonical emergency_updated — always reflects latest MongoDB state
+    const handleEmergencyUpdated = (data: any) => {
+      console.log('[PATIENT DASHBOARD RECEIVED] emergency_updated:', data);
+      const ec = data.emergencyCase || data;
+      const targetCaseId = data.caseId || ec._id?.toString();
+      if (!ec) return;
+      updateCasesState(prev => ({
+        status: ec.status || prev.status,
+        liveStatus: ec.liveStatus || prev.liveStatus,
+        acceptedDoctor: ec.acceptedDoctor || data.doctor || data.acceptedDoctor || prev.acceptedDoctor,
+        accepted_doctor: ec.accepted_doctor || prev.accepted_doctor,
+        acceptedHospital: ec.acceptedHospital || data.hospital || data.acceptedHospital || prev.acceptedHospital,
+        accepted_hospital: ec.accepted_hospital || prev.accepted_hospital,
+        acceptedAmbulance: ec.acceptedAmbulance || data.ambulance || data.acceptedAmbulance || prev.acceptedAmbulance,
+        accepted_ambulance: ec.accepted_ambulance || prev.accepted_ambulance,
+        timeline: ec.timeline || prev.timeline,
+        etaMinutes: ec.etaMinutes || prev.etaMinutes,
+        doctorStatus: data.doctorStatus || ec.doctorStatus || prev.doctorStatus,
+        hospitalStatus: data.hospitalStatus || ec.hospitalStatus || prev.hospitalStatus,
+        ambulanceStatus: data.ambulanceStatus || ec.ambulanceStatus || prev.ambulanceStatus,
+      }), targetCaseId);
+      refreshNotifications();
+    };
+
+    sock.on('emergency_updated', handleEmergencyUpdated);
+    sock.on('emergency_case_updated', handleEmergencyUpdated);
+    sock.on('case_updated', handleEmergencyUpdated);
 
     // ── PATIENT LIVE LOCATION BROADCAST ──
     let locationWatchId: number | null = null;

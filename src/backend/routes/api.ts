@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import { register, login, logout, getAdminStats } from '../controllers/AuthController.js';
-import { createSOS, acceptSOS, rejectSOS, forwardSOS, getActiveCases, getPatientStatus, getOnlineDoctors, acceptAmbulance, acceptHospital, updateAmbulanceStatus, rejectAmbulanceDispatch } from '../controllers/SOSController.js';
+import { createSOS, acceptSOS, rejectSOS, forwardSOS, getActiveCases, getPatientStatus, getOnlineDoctors, acceptAmbulance, acceptHospital, updateAmbulanceStatus, rejectAmbulanceDispatch, downloadEmergencyReport, getEmergencyCaseById } from '../controllers/SOSController.js';
 import {
   getNearbyHospitals,
   getNearbyDoctors,
@@ -79,6 +79,9 @@ router.get('/sos/active', authenticateJWT as any, getActiveCases);
 router.get('/doctor/pending-emergencies', authenticateJWT as any, getActiveCases);
 router.get('/sos/patient-status/:caseId', getPatientStatus);
 router.get('/sos/online-doctors', getOnlineDoctors);
+router.get('/emergency/:caseId/report', downloadEmergencyReport);
+router.get('/sos/pdf/:caseId', downloadEmergencyReport);
+router.get('/emergency/:caseId', getEmergencyCaseById);
 
 // ── FUZZY SEARCH ────────────────────────────────────────────────────────────
 router.get('/search', fuzzySearch);

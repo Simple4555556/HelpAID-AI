@@ -64,6 +64,27 @@ export default function HospitalSOSDashboard({ user }: { user: any }) {
     sock.on('new_emergency', () => fetchCases());
     sock.on('case_locked', () => fetchCases());
 
+    // Canonical updates — refresh on any case state change
+    sock.on('emergency_updated', (data: any) => {
+      console.log('[HOSPITAL DASHBOARD RECEIVED] emergency_updated:', data);
+      const ec = data.emergencyCase || data;
+      const caseId = data.caseId || ec._id?.toString();
+      if (!caseId) return;
+      setCases(prev => {
+        const exists = prev.find(c => c._id === caseId || c._id?.toString() === caseId);
+        if (exists) {
+          return prev.map(c => (c._id === caseId || c._id?.toString() === caseId)
+            ? { ...c, status: ec.status || c.status, liveStatus: ec.liveStatus || c.liveStatus, acceptedDoctor: data.doctor || ec.acceptedDoctor || c.acceptedDoctor }
+            : c
+          );
+        }
+        return prev;
+      });
+    });
+    sock.on('emergency_case_updated', () => fetchCases());
+    sock.on('doctor_accepted', () => fetchCases());
+    sock.on('hospital_accepted', () => fetchCases());
+
     sock.on('tracking:update', (data: any) => {
       console.log('[HOSPITAL RECEIVED] tracking:update:', data);
       setCases(prev => prev.map(c => {

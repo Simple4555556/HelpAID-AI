@@ -305,6 +305,56 @@ export default function AmbulanceDashboard({ user }: { user: any }) {
       });
     });
 
+    // emergency_updated — keep activeRide in sync with MongoDB state
+    newSocket.on('emergency_updated', (data: any) => {
+      console.log('[AMBULANCE DASHBOARD RECEIVED] emergency_updated:', data);
+      const ec = data.emergencyCase || data;
+      setActiveRide((prev: any) => {
+        if (!prev) return prev;
+        const caseMatches = prev.caseId === (data.caseId || ec._id?.toString());
+        if (!caseMatches) return prev;
+        return {
+          ...prev,
+          liveStatus: ec.liveStatus || prev.liveStatus,
+          doctorDetails: (ec.accepted_doctor || data.doctor || data.acceptedDoctor)
+            ? {
+                name: (ec.accepted_doctor?.name || data.doctor?.name || data.acceptedDoctor?.doctorName || prev.doctorDetails?.name),
+                phone: (ec.accepted_doctor?.phone || data.doctor?.phone || data.acceptedDoctor?.phone || prev.doctorDetails?.phone),
+                specialization: (ec.accepted_doctor?.specialization || data.doctor?.specialization || data.acceptedDoctor?.specialization || prev.doctorDetails?.specialization),
+              }
+            : prev.doctorDetails,
+          hospitalDetails: (ec.accepted_hospital || data.hospital || data.acceptedHospital)
+            ? {
+                name: (ec.accepted_hospital?.name || data.hospital?.name || data.acceptedHospital?.name || prev.hospitalDetails?.name),
+                phone: (ec.accepted_hospital?.phone || data.hospital?.phone || data.acceptedHospital?.phone || prev.hospitalDetails?.phone),
+                address: (ec.accepted_hospital?.address || data.hospital?.address || data.acceptedHospital?.address || prev.hospitalDetails?.address),
+              }
+            : prev.hospitalDetails,
+        };
+      });
+      // Also update in pending requests list
+      setRideRequests(prev => prev.map(r =>
+        r.caseId === (data.caseId || ec._id?.toString())
+          ? { ...r, doctorDetails: ec.accepted_doctor || data.doctor || r.doctorDetails }
+          : r
+      ));
+    });
+
+    newSocket.on('emergency_case_updated', (data: any) => {
+      console.log('[AMBULANCE DASHBOARD RECEIVED] emergency_case_updated:', data);
+      // same handler as emergency_updated
+      const ec = data.emergencyCase || data;
+      setActiveRide((prev: any) => {
+        if (!prev) return prev;
+        const caseMatches = prev.caseId === (data.caseId || ec._id?.toString());
+        if (!caseMatches) return prev;
+        return {
+          ...prev,
+          liveStatus: ec.liveStatus || prev.liveStatus,
+        };
+      });
+    });
+
     return () => {
       newSocket.emit('user:offline', { userId, role: 'ambulance_driver', profileId: ambulanceId });
       newSocket.close();

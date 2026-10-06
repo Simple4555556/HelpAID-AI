@@ -294,6 +294,23 @@ io.on('connection', (socket) => {
     console.log(`[AUDIT] Joined Room: ambulance_${ambulanceId}`);
   });
 
+  // ── Canonical Case Room Join ──────────────────────────────────────────
+  socket.on('join_case_room', (data: { caseId: string } | string) => {
+    const caseId = typeof data === 'string' ? data : data?.caseId;
+    if (caseId) {
+      socket.join(`case_${caseId}`);
+      console.log(`[Socket ${socket.id}] Joined case room: case_${caseId}`);
+    }
+  });
+
+  socket.on('join_case', (data: { caseId: string } | string) => {
+    const caseId = typeof data === 'string' ? data : data?.caseId;
+    if (caseId) {
+      socket.join(`case_${caseId}`);
+      console.log(`[Socket ${socket.id}] Joined case room: case_${caseId}`);
+    }
+  });
+
   // ── Live Tracking: Ambulance Location Updates ─────────────────────────
   const updateLocationHandler = async (data: { caseId: string; lat: number; lng: number }) => {
     if (!data.caseId || data.lat == null || data.lng == null || isNaN(data.lat) || isNaN(data.lng)) return;
@@ -570,7 +587,6 @@ io.on('connection', (socket) => {
 // Export io so controllers can use it
 export { io };
 
-const PORT = process.env.PORT || 5000;
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
 // Initialize MongoDB and log data status
@@ -957,6 +973,11 @@ export function getRequiredSpecializationsForInjury(injuryType: string, explanat
 
 // 2. AI Image Analysis Gateway Endpoints (Combined Upload & Base64 Compatibility)
 app.post(['/api/predict-image', '/predict', '/emergency', '/api/analyze-injury'], upload.single('image'), async (req, res) => {
+  const reqStart = Date.now();
+  const requestId = `req_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const caseId = req.body.caseId || req.query.caseId || 'unassigned';
+  console.log(`[AI START]\nrequestId=${requestId}\ncaseId=${caseId}`);
+
   try {
     console.log("[IMAGE RECEIVED] Emergency request received on backend");
     let imageBuffer: Buffer;
@@ -983,8 +1004,7 @@ app.post(['/api/predict-image', '/predict', '/emergency', '/api/analyze-injury']
       return res.status(400).json({ error: 'No image file or base64 data provided.' });
     }
 
-    console.log(`[IMAGE SIZE] Size: ${imageBuffer.length} bytes`);
-
+    console.log(`[AI IMAGE PREPROCESS]\noriginalSize=${imageBuffer.length}\nprocessedSize=${imageBuffer.length}`);
     const base64String = imageBuffer.toString('base64');
     console.log(`[BASE64 CREATED] MimeType: ${mimeType}, base64 string created.`);
 
@@ -1026,7 +1046,8 @@ Guidelines:
     while (attempts < 2) {
       try {
         attempts++;
-        console.log(`[API REQUEST SENT] Calling Gemini AI (Attempt ${attempts}/2) with image and prompt`);
+        const geminiStart = Date.now();
+        console.log(`[AI GEMINI START] Attempt ${attempts}/2 calling model=${model}`);
         response = await ai.models.generateContent({
           model,
           contents: [
@@ -1065,6 +1086,9 @@ Guidelines:
           }
         });
 
+        const geminiDuration = Date.now() - geminiStart;
+        console.log(`[AI GEMINI END]\ndurationMs=${geminiDuration}`);
+
         if (response && response.text) {
           rawText = response.text;
           console.log(`[GEMINI RAW RESPONSE] Attempt ${attempts} succeeded.`);
@@ -1092,6 +1116,7 @@ Guidelines:
       throw detailedError;
     }
 
+    console.log('[AI PARSE] Parsing JSON response');
     // AI Response Parsing
     let parsedData: any = {};
     try {
@@ -1181,6 +1206,8 @@ Guidelines:
       hospitalRecommendation: emergencyRecommendationVal
     };
 
+    const totalDuration = Date.now() - reqStart;
+    console.log(`[AI COMPLETE]\ndurationMs=${totalDuration}\nseverity=${severityMapped}`);
     console.log('[FINAL RESULT] Result payload built:', JSON.stringify(finalResult));
 
     // Save report to MongoDB / In-memory DB

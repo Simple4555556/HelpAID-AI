@@ -62,6 +62,7 @@ export default function EmergencyTracker() {
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
   const [liveStatus, setLiveStatus] = useState<string>('On Route');
   const [ambulanceDetails, setAmbulanceDetails] = useState<any | null>(null);
+  const [doctorDetails, setDoctorDetails] = useState<any | null>(null);
   const [hospitalDetails, setHospitalDetails] = useState<any | null>(null);
   const [connected, setConnected] = useState(false);
 
@@ -93,7 +94,7 @@ export default function EmergencyTracker() {
     }
   }, []);
 
-  // 1. Fetch initial status
+  // 1. Fetch initial status from MongoDB (Source of Truth)
   useEffect(() => {
     if (!caseId) return;
     const fetchInitialStatus = async () => {
@@ -108,8 +109,12 @@ export default function EmergencyTracker() {
           setPatientLoc(data.patientLoc);
           setAmbLoc(data.ambulanceLoc);
           setHospLoc(data.hospitalLoc);
-          setAmbulanceDetails(data.assignedAmbulance);
-          setHospitalDetails(data.assignedHospital);
+          if (data.doctorLoc) setDoctorLoc(data.doctorLoc);
+          if (data.assignedDoctor || data.doctor || data.acceptedDoctor) {
+            setDoctorDetails(data.assignedDoctor || data.doctor || data.acceptedDoctor);
+          }
+          if (data.assignedAmbulance) setAmbulanceDetails(data.assignedAmbulance);
+          if (data.assignedHospital) setHospitalDetails(data.assignedHospital);
         }
       } catch (e) {
         console.warn('Failed to fetch initial status:', e);
@@ -221,8 +226,12 @@ export default function EmergencyTracker() {
       console.log('[TRACKER RECEIVED] doctor_accepted:', data);
       setStatus('DOCTOR_ACCEPTED');
       setLiveStatus('Doctor Accepted');
-      if (data.doctor) {
-        setDoctorLoc({ lat: data.doctor.latitude || data.doctor.lat, lng: data.doctor.longitude || data.doctor.lng });
+      if (data.doctor || data.assignedDoctor || data.acceptedDoctor) {
+        setDoctorDetails(data.doctor || data.assignedDoctor || data.acceptedDoctor);
+        const doc = data.doctor || data.assignedDoctor || data.acceptedDoctor;
+        if (doc.latitude || doc.lat) {
+          setDoctorLoc({ lat: doc.latitude || doc.lat, lng: doc.longitude || doc.lng });
+        }
       }
       if (data.hospital) {
         setHospitalDetails(data.hospital);
@@ -239,6 +248,25 @@ export default function EmergencyTracker() {
       }
     };
 
+    const handleEmergencyUpdated = (data: any) => {
+      console.log('[TRACKER RECEIVED] emergency_updated:', data);
+      const ec = data.emergencyCase || data;
+      if (ec) {
+        if (ec.status) setStatus(ec.status);
+        if (ec.liveStatus) setLiveStatus(ec.liveStatus);
+        if (ec.doctor || ec.assignedDoctor || ec.acceptedDoctor) {
+          setDoctorDetails(ec.doctor || ec.assignedDoctor || ec.acceptedDoctor);
+        }
+        if (ec.hospital || ec.assignedHospital) {
+          setHospitalDetails(ec.hospital || ec.assignedHospital);
+        }
+        if (ec.ambulance || ec.assignedAmbulance) {
+          setAmbulanceDetails(ec.ambulance || ec.assignedAmbulance);
+        }
+      }
+    };
+
+    newSocket.on('emergency_updated', handleEmergencyUpdated);
     newSocket.on('doctor_accepted', handleDoctorAccepted);
     newSocket.on('doctor:accepted', handleDoctorAccepted);
     newSocket.on('doctor_request_accepted', handleDoctorAccepted);
@@ -519,16 +547,49 @@ export default function EmergencyTracker() {
           )}
         </div>
 
+        {/* Attending Doctor Details */}
+        {doctorDetails && (
+          <div className="bg-emerald-50 rounded-2xl p-3.5 border border-emerald-100 mb-4 flex gap-3 items-center">
+            <div className="w-11 h-11 bg-white rounded-full border border-emerald-200 flex items-center justify-center shadow-sm text-emerald-600 text-lg">
+              👨‍⚕️
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-slate-800 text-sm">{doctorDetails.name || 'Attending Doctor'}</h3>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded-md">Accepted</span>
+              </div>
+              <p className="text-xs font-semibold text-slate-500">
+                {doctorDetails.specialization || 'Emergency Specialist'} {doctorDetails.hospital ? `· ${doctorDetails.hospital}` : ''}
+              </p>
+            </div>
+            {doctorDetails.phone && (
+              <a href={`tel:${doctorDetails.phone}`} className="w-9 h-9 bg-emerald-200 hover:bg-emerald-300 text-emerald-800 rounded-full flex items-center justify-center transition-colors">
+                <Phone size={16} />
+              </a>
+            )}
+          </div>
+        )}
+
         {/* Hospital Destination */}
         {hospitalDetails ? (
-          <div className="w-full py-3 bg-emerald-50 text-emerald-700 font-bold rounded-2xl border border-emerald-100 flex justify-center items-center gap-2 text-sm">
+          <div className="w-full py-3 bg-blue-50 text-blue-700 font-bold rounded-2xl border border-blue-100 flex justify-center items-center gap-2 text-sm mb-4">
             <MapPin size={16} /> Destination: {hospitalDetails.name}
           </div>
         ) : (
-          <div className="w-full py-3 bg-slate-50 text-slate-500 font-bold rounded-2xl border border-slate-100 flex justify-center items-center gap-2 text-sm">
+          <div className="w-full py-3 bg-slate-50 text-slate-500 font-bold rounded-2xl border border-slate-100 flex justify-center items-center gap-2 text-sm mb-4">
             <MapPin size={16} /> Awaiting hospital destination
           </div>
         )}
+
+        {/* PDF Emergency Report */}
+        <a
+          href={`${SOCKET_URL === '/' ? '' : SOCKET_URL}/api/emergency/${caseId}/report`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-3.5 bg-slate-900 hover:bg-black text-white font-bold rounded-2xl shadow-md flex justify-center items-center gap-2 text-sm transition-all"
+        >
+          📄 Download Pre-Arrival Emergency PDF Report
+        </a>
       </motion.div>
     </div>
   );

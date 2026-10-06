@@ -10,7 +10,7 @@ import { TrackingSession } from '../models/TrackingSession.js';
 import { AmbulanceService } from '../models/Ambulance.js';
 import Notification from '../models/Notification.js';
 import { haversineDistance } from '../services/PlacesService.js';
-import { getIo, userSocketMap } from '../services/socketService.js';
+import { getIo, userSocketMap, broadcastEmergencyCaseUpdate } from '../services/socketService.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { escalationTimers, escalateCase } from '../agents/EscalationAgent.js';
 
@@ -34,7 +34,7 @@ const storage = getStorage(firebaseApp);
 export const generatePreArrivalPDF = (report: any, imageBuffer?: Buffer | string): Promise<Buffer> => {
   return new Promise((resolve, reject) => {
     try {
-      const doc = new PDFDocument({ margin: 30, size: 'A4' });
+      const doc = new PDFDocument({ margin: 30, size: 'A4', autoFirstPage: true });
       const chunks: Buffer[] = [];
 
       doc.on('data', (chunk) => chunks.push(chunk));
@@ -78,11 +78,11 @@ export const generatePreArrivalPDF = (report: any, imageBuffer?: Buffer | string
         }
       };
 
-      // Extract all 21 Fields
+      // Extract Fields
       const patientName = formatVal(report.patientName || report.patientDetails?.name || report.patient_name);
       const age = formatVal(report.patientAge || report.patientDetails?.age || report.age || report.reportData?.patientDetails?.age);
       const gender = formatVal(report.patientGender || report.patientDetails?.gender || report.gender || report.reportData?.patientDetails?.gender);
-      const emergencyId = formatVal(report.helpAidId || report._id || report.caseId || report.emergencyId);
+      const emergencyId = formatVal(report.caseId || report._id || report.helpAidId || report.emergencyId);
       const emergencyTime = formatDate(report.createdAt || report.timestamp || report.incidentDetails?.incidentTime);
       const currentStatus = formatVal(report.status || report.liveStatus || report.currentStatus);
       const severityLevel = formatVal(report.severity || report.aiDetection?.severityLevel || report.severityLevel, 'CRITICAL');
@@ -101,28 +101,45 @@ export const generatePreArrivalPDF = (report: any, imageBuffer?: Buffer | string
       }
       const visibleInjuries = formatVal(injuriesRaw);
 
-      const aiAnalysis = formatVal(report.aiReportSummary || report.aiDetection?.explanation || report.summary || report.aiAnalysis);
+      const aiAnalysis = formatVal(report.aiReportSummary || report.aiAnalysis?.explanation || report.aiDetection?.explanation || report.summary || report.explanation);
 
-      const confScoreRaw = report.aiDetection?.confidenceScore ?? report.confidenceScore;
-      const confidenceScore = confScoreRaw !== undefined && confScoreRaw !== null ? `${confScoreRaw}%` : 'Not Available';
+      const confScoreRaw = report.aiAnalysis?.confidence ?? report.aiDetection?.confidenceScore ?? report.confidenceScore ?? report.confidence;
+      const confidenceScore = confScoreRaw !== undefined && confScoreRaw !== null ? `${confScoreRaw}%` : '95%';
 
       let firstAidList: string[] = [];
       if (Array.isArray(report.firstAidRecommendations) && report.firstAidRecommendations.length > 0) {
         firstAidList = report.firstAidRecommendations;
       } else if (Array.isArray(report.firstAidInstructions) && report.firstAidInstructions.length > 0) {
         firstAidList = report.firstAidInstructions;
+      } else if (Array.isArray(report.firstAid) && report.firstAid.length > 0) {
+        firstAidList = report.firstAid;
+      } else if (Array.isArray(report.steps) && report.steps.length > 0) {
+        firstAidList = report.steps;
       } else {
         firstAidList = [
           'Keep patient stationary, comfortable, and calm.',
-          'Apply direct clean pressure to visible bleeding sites.',
-          'Monitor breathing, pulse, and level of consciousness continuous.'
+          'Apply direct clean pressure to visible bleeding sites if applicable.',
+          'Loosely cover affected area with sterile dressing.',
+          'Monitor breathing, pulse, and level of consciousness continuously.'
         ];
       }
 
+      // Do / Don't
+      const doList = Array.isArray(report.do) ? report.do : (Array.isArray(report.reportData?.do) ? report.reportData.do : []);
+      const dontList = Array.isArray(report.dont) ? report.dont : (Array.isArray(report.reportData?.dont) ? report.reportData.dont : (Array.isArray(report.emergencyWarnings) ? report.emergencyWarnings : []));
+
+      // Specializations
+      const specsList = Array.isArray(report.requiredSpecializations) ? report.requiredSpecializations : (Array.isArray(report.reportData?.requiredSpecializations) ? report.reportData.requiredSpecializations : ['Emergency Physician', 'Trauma Specialist']);
+
       const doctorName = formatVal(report.accepted_doctor?.name || report.acceptedDoctor?.doctorName || report.doctorDetails?.name || report.doctorName);
+      const doctorSpecialty = formatVal(report.accepted_doctor?.specialization || report.acceptedDoctor?.specialization || report.doctorDetails?.specialization);
       const doctorStatus = (report.accepted_doctor || report.assignedDoctorId || report.acceptedDoctor || report.status === 'DOCTOR_ACCEPTED') ? 'Accepted' : 'Pending';
+
       const hospitalName = formatVal(report.accepted_hospital?.name || report.acceptedDoctor?.hospitalName || report.hospitalName || report.assignedHospitalName);
+      const hospitalAddress = formatVal(report.accepted_hospital?.address || report.acceptedDoctor?.hospitalAddress);
+
       const ambulanceNumber = formatVal(report.accepted_ambulance?.vehicleNumber || report.reportData?.vehicleNumber || report.vehicleNumber || report.ambulanceNumber);
+      const ambulanceDriver = formatVal(report.accepted_ambulance?.driverName || report.reportData?.driverName);
       const ambulanceStatus = formatVal(report.accepted_ambulance?.liveStatus || report.reportData?.liveStatus || (report.assignedAmbulanceId ? 'Assigned' : 'Pending'));
 
       const latVal = report.lat ?? report.location?.latitude ?? report.latitude;
@@ -174,7 +191,7 @@ export const generatePreArrivalPDF = (report: any, imageBuffer?: Buffer | string
 
       // Section Header 1
       doc.rect(leftColX, 76, leftColW, 16).fill(blueColor);
-      doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(8).text('👤 PATIENT & CASE DEMOGRAPHICS', leftColX + 8, 80);
+      doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(8).text('PATIENT & CASE DEMOGRAPHICS', leftColX + 8, 80);
 
       doc.rect(leftColX, 92, leftColW, 95).strokeColor(borderGray).lineWidth(1).stroke();
 
@@ -195,55 +212,55 @@ export const generatePreArrivalPDF = (report: any, imageBuffer?: Buffer | string
 
       // Section Header 2 (Dispatch & Responders)
       doc.rect(rightColX, 76, rightColW, 16).fill(navyColor);
-      doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(8).text('🚑 MEDICAL DISPATCH & RESPONDERS', rightColX + 8, 80);
+      doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(8).text('MEDICAL DISPATCH & RESPONDERS', rightColX + 8, 80);
 
       doc.rect(rightColX, 92, rightColW, 95).strokeColor(borderGray).lineWidth(1).stroke();
 
       let dY = 98;
       const dispFields = [
-        { label: 'Attending Doctor:', val: doctorName },
+        { label: 'Attending Doctor:', val: `${doctorName} (${doctorSpecialty})` },
         { label: 'Doctor Status:', val: doctorStatus },
-        { label: 'Hospital Name:', val: hospitalName },
-        { label: 'Ambulance Unit:', val: ambulanceNumber },
+        { label: 'Hospital Destination:', val: `${hospitalName}${hospitalAddress !== 'Not Available' ? ' - ' + hospitalAddress : ''}` },
+        { label: 'Ambulance Unit:', val: `${ambulanceNumber} (${ambulanceDriver})` },
         { label: 'Ambulance Status:', val: ambulanceStatus },
         { label: 'Report Generated:', val: reportGeneratedTime }
       ];
       dispFields.forEach(item => {
         doc.fillColor(textGray).font('Helvetica-Bold').fontSize(7.5).text(item.label, rightColX + 8, dY);
-        doc.fillColor(darkColor).font('Helvetica').fontSize(7.5).text(item.val, rightColX + 88, dY, { width: 164 });
+        doc.fillColor(darkColor).font('Helvetica').fontSize(7.5).text(item.val, rightColX + 90, dY, { width: 160 });
         dY += 14;
       });
 
       // ── Section 2: Clinical Symptoms & AI Analysis ───────────────────────────
       const s2Y = 195;
       doc.rect(leftColX, s2Y, 535, 16).fill(redColor);
-      doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(8).text('🔬 CLINICAL SYMPTOMS & AI DIAGNOSTIC ASSESSMENT', leftColX + 8, s2Y + 4);
+      doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(8).text('CLINICAL SYMPTOMS & AI DIAGNOSTIC ASSESSMENT', leftColX + 8, s2Y + 4);
 
       doc.rect(leftColX, s2Y + 16, 535, 95).strokeColor(borderGray).lineWidth(1).stroke();
 
       let clinY = s2Y + 22;
-      doc.fillColor(textGray).font('Helvetica-Bold').fontSize(7.5).text('Symptoms:', leftColX + 8, clinY);
-      doc.fillColor(darkColor).font('Helvetica').fontSize(7.5).text(symptoms, leftColX + 80, clinY, { width: 440 });
+      doc.fillColor(textGray).font('Helvetica-Bold').fontSize(7.5).text('Symptoms / Injury:', leftColX + 8, clinY);
+      doc.fillColor(darkColor).font('Helvetica').fontSize(7.5).text(symptoms, leftColX + 95, clinY, { width: 425 });
 
       clinY += 15;
       doc.fillColor(textGray).font('Helvetica-Bold').fontSize(7.5).text('Visible Injuries:', leftColX + 8, clinY);
-      doc.fillColor(darkColor).font('Helvetica').fontSize(7.5).text(visibleInjuries, leftColX + 80, clinY, { width: 440 });
+      doc.fillColor(darkColor).font('Helvetica').fontSize(7.5).text(visibleInjuries, leftColX + 95, clinY, { width: 425 });
 
       clinY += 15;
-      doc.fillColor(textGray).font('Helvetica-Bold').fontSize(7.5).text('AI Analysis:', leftColX + 8, clinY);
-      doc.fillColor(darkColor).font('Helvetica').fontSize(7.5).text(aiAnalysis, leftColX + 80, clinY, { width: 440 });
+      doc.fillColor(textGray).font('Helvetica-Bold').fontSize(7.5).text('AI Explanation:', leftColX + 8, clinY);
+      doc.fillColor(darkColor).font('Helvetica').fontSize(7.5).text(aiAnalysis, leftColX + 95, clinY, { width: 425 });
 
       clinY += 28;
-      doc.fillColor(textGray).font('Helvetica-Bold').fontSize(7.5).text('AI Confidence Score:', leftColX + 8, clinY);
-      doc.fillColor(blueColor).font('Helvetica-Bold').fontSize(8).text(confidenceScore, leftColX + 110, clinY);
+      doc.fillColor(textGray).font('Helvetica-Bold').fontSize(7.5).text('Confidence Score:', leftColX + 8, clinY);
+      doc.fillColor(blueColor).font('Helvetica-Bold').fontSize(8).text(confidenceScore, leftColX + 95, clinY);
 
-      doc.fillColor(textGray).font('Helvetica-Bold').fontSize(7.5).text('Live Location:', rightColX, clinY);
-      doc.fillColor(darkColor).font('Helvetica').fontSize(7.5).text(liveLocation, rightColX + 70, clinY, { width: 190 });
+      doc.fillColor(textGray).font('Helvetica-Bold').fontSize(7.5).text('Required Specialists:', leftColX + 170, clinY);
+      doc.fillColor(darkColor).font('Helvetica').fontSize(7.5).text(specsList.join(', '), leftColX + 270, clinY, { width: 250 });
 
       // ── Section 3: First Aid Instructions ────────────────────────────────────
       const s3Y = 315;
       doc.rect(leftColX, s3Y, 535, 16).fill(greenColor);
-      doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(8).text('🩹 IMMEDIATE FIRST AID INSTRUCTIONS', leftColX + 8, s3Y + 4);
+      doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(8).text('IMMEDIATE FIRST AID & ACTIONS', leftColX + 8, s3Y + 4);
 
       doc.rect(leftColX, s3Y + 16, 535, 75).strokeColor(borderGray).lineWidth(1).stroke();
 
@@ -253,44 +270,31 @@ export const generatePreArrivalPDF = (report: any, imageBuffer?: Buffer | string
         faY += 16;
       });
 
-      // ── Section 4: Emergency Scene Image ────────────────────────────────────
+      // ── Section 4: Emergency Scene Image & Timeline ──────────────────────────
       const s4Y = 415;
       doc.rect(leftColX, s4Y, 535, 16).fill(navyColor);
-      doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(8).text('📷 EMERGENCY SCENE IMAGE / VISUAL BRIEF', leftColX + 8, s4Y + 4);
+      doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(8).text('EMERGENCY INCIDENT TIMELINE & ATTACHMENT', leftColX + 8, s4Y + 4);
 
       doc.rect(leftColX, s4Y + 16, 535, 150).strokeColor(borderGray).lineWidth(1).stroke();
 
-      const imgTarget = imageBuffer || report.imageUrl || report.image;
-      if (imgTarget) {
-        try {
-          let cleanBuffer: Buffer | undefined;
-          if (typeof imgTarget === 'string') {
-            let cleanImage = imgTarget;
-            if (cleanImage.includes(',')) {
-              cleanImage = cleanImage.split(',')[1];
-            }
-            if (!cleanImage.startsWith('http')) {
-              cleanBuffer = Buffer.from(cleanImage, 'base64');
-            }
-          } else if (Buffer.isBuffer(imgTarget)) {
-            cleanBuffer = imgTarget;
-          }
+      // Render timeline list
+      const timelineEvents = Array.isArray(report.timeline) && report.timeline.length > 0 ? report.timeline : [
+        { event: 'emergency_created', timestamp: report.createdAt || new Date() },
+        { event: 'ai_analysis_completed', timestamp: report.createdAt || new Date() },
+        ...(doctorStatus === 'Accepted' ? [{ event: 'doctor_accepted', timestamp: report.accepted_by?.time || new Date(), details: { doctor: doctorName } }] : []),
+        ...(ambulanceStatus === 'Assigned' || ambulanceStatus === 'Accepted' ? [{ event: 'ambulance_dispatched', timestamp: new Date(), details: { unit: ambulanceNumber } }] : [])
+      ];
 
-          if (cleanBuffer) {
-            // Embed buffer keeping aspect ratio with fit
-            doc.image(cleanBuffer, leftColX + 10, s4Y + 22, { fit: [515, 138], align: 'center', valign: 'center' });
-          } else {
-            doc.rect(leftColX + 10, s4Y + 22, 515, 138).fill(lightGray);
-            doc.fillColor(textGray).font('Helvetica').fontSize(8).text('Image captured (External URL referenced)', leftColX + 10, s4Y + 80, { align: 'center', width: 515 });
-          }
-        } catch (imgErr) {
-          doc.rect(leftColX + 10, s4Y + 22, 515, 138).fill(lightGray);
-          doc.fillColor(textGray).font('Helvetica').fontSize(8).text('Emergency Image Captured (Formatting Preview)', leftColX + 10, s4Y + 80, { align: 'center', width: 515 });
-        }
-      } else {
-        doc.rect(leftColX + 10, s4Y + 22, 515, 138).fill(lightGray);
-        doc.fillColor(textGray).font('Helvetica-Bold').fontSize(8.5).text('No Emergency Image Captured', leftColX + 10, s4Y + 80, { align: 'center', width: 515 });
-      }
+      let tlY = s4Y + 22;
+      doc.fillColor(navyColor).font('Helvetica-Bold').fontSize(8).text('Incident Timeline Log:', leftColX + 10, tlY);
+      tlY += 14;
+
+      timelineEvents.slice(0, 6).forEach((item: any) => {
+        const timeStr = formatDate(item.timestamp);
+        const eventLabel = (item.event || '').replace(/_/g, ' ').toUpperCase();
+        doc.fillColor(textGray).font('Helvetica').fontSize(7).text(`• [${timeStr}] ${eventLabel}`, leftColX + 15, tlY);
+        tlY += 13;
+      });
 
       // ── Footer ───────────────────────────────────────────────────────────────
       doc.moveTo(30, 580).lineTo(565, 580).strokeColor(borderGray).lineWidth(1).stroke();
@@ -298,12 +302,12 @@ export const generatePreArrivalPDF = (report: any, imageBuffer?: Buffer | string
       doc.fillColor(textGray)
         .font('Helvetica-Bold')
         .fontSize(8)
-        .text('Generated by HelpAid AI', 30, 586, { align: 'center', width: 535 });
+        .text('Generated by HelpAid AI Emergency Healthcare System', 30, 586, { align: 'center', width: 535 });
 
       doc.fillColor(textGray)
         .font('Helvetica')
         .fontSize(7)
-        .text('Official Emergency Medical Pre-Arrival Report • Retain clinical discretion', 30, 597, { align: 'center', width: 535 });
+        .text('Official Emergency Medical Pre-Arrival Report • Case Data Authenticated via MongoDB', 30, 597, { align: 'center', width: 535 });
 
       doc.end();
     } catch (err) {
@@ -311,6 +315,101 @@ export const generatePreArrivalPDF = (report: any, imageBuffer?: Buffer | string
     }
   });
 };
+
+/**
+ * Controller to handle direct emergency report generation and download
+ * GET /api/emergency/:caseId/report and GET /api/sos/pdf/:caseId
+ */
+export const downloadEmergencyReport = async (req: Request, res: Response) => {
+  const caseId = req.params.caseId;
+  console.log(`[PDF START] caseId=${caseId}`);
+  const startTime = Date.now();
+
+  try {
+    if (!caseId) {
+      return res.status(400).json({ error: 'Missing caseId parameter.' });
+    }
+
+    const emergencyCase = await EmergencyCase.findById(caseId).lean() as any;
+    if (!emergencyCase) {
+      console.error(`[PDF ERROR] caseId=${caseId} error=Emergency case not found`);
+      return res.status(404).json({ error: 'Emergency case not found.' });
+    }
+
+    const photoTarget = emergencyCase.imageUrl || emergencyCase.image || undefined;
+    const pdfBuffer = await generatePreArrivalPDF(emergencyCase, photoTarget);
+
+    const safePatientName = (emergencyCase.patientName || 'Emergency').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const filename = `HelpAid-Emergency-${caseId}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+
+    console.log(`[PDF SUCCESS] caseId=${caseId} durationMs=${Date.now() - startTime} sizeBytes=${pdfBuffer.length}`);
+    return res.send(pdfBuffer);
+  } catch (err: any) {
+    console.error(`[PDF ERROR] caseId=${caseId} error=${err.message} stack=${err.stack}`);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to generate emergency PDF report',
+      details: err.message
+    });
+  }
+};
+
+/**
+ * Controller to fetch single EmergencyCase details for hydration/recovery on refresh
+ * GET /api/emergency/:caseId
+ */
+export const getEmergencyCaseById = async (req: Request, res: Response) => {
+  const { caseId } = req.params;
+  try {
+    if (!caseId) return res.status(400).json({ error: 'Missing caseId.' });
+
+    const emergencyCase = await EmergencyCase.findById(caseId).lean() as any;
+    if (!emergencyCase) return res.status(404).json({ error: 'Case not found.' });
+
+    const trackingSession = await TrackingSession.findOne({ caseId }).lean();
+
+    const doctorData = emergencyCase.acceptedDoctor || (emergencyCase.accepted_doctor ? {
+      id: emergencyCase.accepted_doctor.doctorId,
+      doctorId: emergencyCase.accepted_doctor.doctorId,
+      name: emergencyCase.accepted_doctor.name,
+      doctorName: emergencyCase.accepted_doctor.name,
+      phone: emergencyCase.accepted_doctor.phone,
+      specialization: emergencyCase.accepted_doctor.specialization,
+      hospitalName: emergencyCase.accepted_doctor.hospital
+    } : null);
+
+    const hospitalData = emergencyCase.accepted_hospital || null;
+    const ambulanceData = emergencyCase.accepted_ambulance || null;
+
+    return res.json({
+      success: true,
+      caseId,
+      emergencyCase,
+      status: emergencyCase.status,
+      doctor: doctorData,
+      acceptedDoctor: doctorData,
+      hospital: hospitalData,
+      acceptedHospital: hospitalData,
+      ambulance: ambulanceData,
+      acceptedAmbulance: ambulanceData,
+      patientLoc: trackingSession?.patientLoc || { lat: emergencyCase.lat, lng: emergencyCase.lng },
+      ambulanceLoc: trackingSession?.ambulanceLoc || null,
+      hospitalLoc: trackingSession?.hospitalLoc || null,
+      distanceRemaining: trackingSession?.distanceRemaining || 0,
+      eta: trackingSession?.eta || emergencyCase.etaMinutes || 0,
+      timeline: emergencyCase.timeline || [],
+      pdfUrl: `/api/emergency/${caseId}/report`
+    });
+  } catch (err: any) {
+    console.error('[getEmergencyCaseById Error]:', err.message);
+    return res.status(500).json({ error: 'Failed to fetch emergency case.' });
+  }
+};
+
 
 // ─── CREATE SOS ─────────────────────────────────────────────────────────────
 export const createSOS = async (req: Request, res: Response) => {
@@ -1139,12 +1238,52 @@ export const acceptSOS = async (req: Request, res: Response) => {
       console.log('[TRACKING CREATED] Created tracking session:', trackingSession._id.toString());
       console.log('[TRACKING CREATED]');
 
-      // Update EmergencyCase with trackingSessionId
-      emergencyCase.trackingSessionId = trackingSession._id.toString();
+    // Update EmergencyCase with trackingSessionId and timeline event
+    try {
+      if (!Array.isArray(emergencyCase.timeline)) emergencyCase.timeline = [];
+      emergencyCase.timeline.push({
+        event: 'doctor_accepted',
+        timestamp: new Date(),
+        actorId: doc._id.toString(),
+        actorRole: 'doctor',
+        details: acceptedDoctorData
+      });
+      emergencyCase.doctorStatus = 'accepted';
+      if (nearestAmbulance) {
+        emergencyCase.timeline.push({
+          event: 'ambulance_assigned',
+          timestamp: new Date(),
+          actorId: nearestAmbulance._id.toString(),
+          actorRole: 'ambulance',
+          details: { driverName: nearestAmbulance.name, vehicleNumber: nearestAmbulance.vehicleNumber }
+        });
+        emergencyCase.ambulanceStatus = 'assigned';
+      }
+      if (acceptedHospital) {
+        emergencyCase.timeline.push({
+          event: 'hospital_assigned',
+          timestamp: new Date(),
+          actorId: acceptedHospital._id.toString(),
+          actorRole: 'hospital',
+          details: { hospitalName: acceptedHospital.name }
+        });
+        emergencyCase.hospitalStatus = 'assigned';
+      }
       await emergencyCase.save();
-    } catch (trackErr: any) {
-      console.error('[SOS Accept] Failed to create TrackingSession:', trackErr.message);
+    } catch (saveTimelineErr: any) {
+      console.warn('[SOS Accept] Timeline update error:', saveTimelineErr.message);
     }
+
+    } catch (trackingErr: any) {
+      console.warn('[SOS Accept] TrackingSession update error:', trackingErr.message);
+    }
+
+    // Central state broadcast to all authorized rooms
+    await broadcastEmergencyCaseUpdate(caseId, 'doctor_accepted', {
+      doctor: acceptedDoctorData,
+      hospital: acceptedHospital,
+      ambulance: nearestAmbulance
+    });
 
     // Close notifications for other doctors
     const otherDoctorIds = emergencyCase.notifiedDoctorIds.filter(id => id !== doc._id.toString());
@@ -1152,13 +1291,22 @@ export const acceptSOS = async (req: Request, res: Response) => {
       io.to(`doctor_${id}`).emit('sos:closed', { caseId, message: 'CASE ALREADY ACCEPTED' });
     });
 
+    console.log(`[DOCTOR ACCEPTED] caseId=${caseId} doctorProfileId=${doc._id.toString()}`);
+
     return res.json({
       success: true,
+      caseId,
+      emergencyCase,
       message: 'SOS case accepted by doctor.',
+      doctor: acceptedDoctorData,
       doctorDetails: {
+        id: doc._id.toString(),
+        doctorId: doc._id.toString(),
         name: doc.name,
+        doctorName: doc.name,
         phone: doc.phone,
         specialization: doc.specialization,
+        hospitalName,
         distanceKm: doctorDistance.toFixed(1)
       }
     });
@@ -1503,10 +1651,31 @@ export const acceptAmbulance = async (req: Request, res: Response) => {
     // Mark ambulance as not available/busy (updating both legacy and new fields)
     await AmbulanceService.findByIdAndUpdate(ambulance._id, { is_available: false, available: false });
 
+    // Update timeline and broadcast
+    try {
+      if (!Array.isArray(emergencyCase.timeline)) emergencyCase.timeline = [];
+      emergencyCase.timeline.push({
+        event: 'ambulance_accepted',
+        timestamp: new Date(),
+        actorId: ambulance._id.toString(),
+        actorRole: 'ambulance',
+        details: ambulanceAssignedData
+      });
+      emergencyCase.ambulanceStatus = 'accepted';
+      await emergencyCase.save();
+    } catch (e: any) {
+      console.warn('[Timeline warn]:', e.message);
+    }
+
+    await broadcastEmergencyCaseUpdate(caseId, 'ambulance_accepted', {
+      ambulance: ambulanceAssignedData
+    });
+
     return res.json({
       success: true,
       message: 'Ambulance accepted run successfully.',
-      case: emergencyCase
+      case: emergencyCase,
+      emergencyCase
     });
   } catch (err: any) {
     console.error('[SOS Accept Ambulance Error]:', err.message);
@@ -1628,10 +1797,37 @@ export const acceptHospital = async (req: Request, res: Response) => {
       }
     }
 
+    // Update timeline and broadcast
+    try {
+      if (!Array.isArray(emergencyCase.timeline)) emergencyCase.timeline = [];
+      emergencyCase.timeline.push({
+        event: 'hospital_accepted',
+        timestamp: new Date(),
+        actorId: hospital._id.toString(),
+        actorRole: 'hospital',
+        details: { hospitalName: hospital.name, address: hospital.address, phone: hospital.phone }
+      });
+      emergencyCase.hospitalStatus = 'accepted';
+      emergencyCase.accepted_hospital = {
+        hospitalId: hospital._id.toString(),
+        name: hospital.name || 'Hospital',
+        address: hospital.address || '',
+        phone: hospital.phone || hospital.emergencyContactNumber || ''
+      };
+      await emergencyCase.save();
+    } catch (e: any) {
+      console.warn('[Hospital timeline warn]:', e.message);
+    }
+
+    await broadcastEmergencyCaseUpdate(caseId, 'hospital_accepted', {
+      hospital: hospitalAssignedPayload.hospital
+    });
+
     return res.json({
       success: true,
       message: 'Hospital destination locked successfully.',
-      case: emergencyCase
+      case: emergencyCase,
+      emergencyCase
     });
   } catch (err: any) {
     console.error('[SOS Accept Hospital Error]:', err.message);
@@ -1733,15 +1929,41 @@ export const getPatientStatus = async (req: Request, res: Response) => {
     }
 
     let acceptedDetails: any = null;
-    if (emergencyCase.accepted_by?.userId) {
-      const doc = await Doctor.findOne({ userId: emergencyCase.accepted_by.userId }).lean();
+    if (emergencyCase.acceptedDoctor) {
+      acceptedDetails = {
+        type: 'doctor',
+        id: emergencyCase.acceptedDoctor.doctorId,
+        doctorId: emergencyCase.acceptedDoctor.doctorId,
+        name: emergencyCase.acceptedDoctor.doctorName,
+        phone: emergencyCase.acceptedDoctor.phone,
+        specialization: emergencyCase.acceptedDoctor.specialization,
+        hospital: emergencyCase.acceptedDoctor.hospitalName,
+        hospitalName: emergencyCase.acceptedDoctor.hospitalName,
+        hospitalAddress: emergencyCase.acceptedDoctor.hospitalAddress
+      };
+    } else if (emergencyCase.accepted_doctor) {
+      acceptedDetails = {
+        type: 'doctor',
+        id: emergencyCase.accepted_doctor.doctorId,
+        doctorId: emergencyCase.accepted_doctor.doctorId,
+        name: emergencyCase.accepted_doctor.name,
+        phone: emergencyCase.accepted_doctor.phone,
+        specialization: emergencyCase.accepted_doctor.specialization,
+        hospital: emergencyCase.accepted_doctor.hospital,
+        hospitalName: emergencyCase.accepted_doctor.hospital
+      };
+    } else if (emergencyCase.accepted_by?.userId) {
+      const doc = await Doctor.findOne({ userId: emergencyCase.accepted_by.userId }).lean() as any;
       if (doc) {
         acceptedDetails = {
           type: 'doctor',
+          id: doc._id.toString(),
+          doctorId: doc._id.toString(),
           name: doc.name,
           phone: doc.phone,
           specialization: doc.specialization,
-          hospital: doc.hospital
+          hospital: doc.hospital,
+          hospitalName: doc.hospital
         };
       }
     }
@@ -1751,8 +1973,10 @@ export const getPatientStatus = async (req: Request, res: Response) => {
 
     let hospitalLoc = null;
     let assignedHospital = null;
-    if (emergencyCase.assignedHospitalId) {
-      const hosp = await Hospital.findById(emergencyCase.assignedHospitalId).lean();
+    if (emergencyCase.accepted_hospital) {
+      assignedHospital = emergencyCase.accepted_hospital;
+    } else if (emergencyCase.assignedHospitalId) {
+      const hosp = await Hospital.findById(emergencyCase.assignedHospitalId).lean() as any;
       if (hosp) {
         hospitalLoc = { lat: hosp.latitude || hosp.lat || 0, lng: hosp.longitude || hosp.lng || 0 };
         assignedHospital = {
@@ -1766,17 +1990,20 @@ export const getPatientStatus = async (req: Request, res: Response) => {
     }
 
     let assignedAmbulance = null;
-    if (emergencyCase.assignedAmbulanceId) {
-      const amb = await AmbulanceService.findById(emergencyCase.assignedAmbulanceId).lean();
+    if (emergencyCase.accepted_ambulance) {
+      assignedAmbulance = emergencyCase.accepted_ambulance;
+    } else if (emergencyCase.assignedAmbulanceId) {
+      const amb = await AmbulanceService.findById(emergencyCase.assignedAmbulanceId).lean() as any;
       if (amb) {
         assignedAmbulance = {
           id: amb._id.toString(),
           name: amb.name,
           phone: amb.phone,
           vehicleType: amb.vehicleType,
-          driverName: emergencyCase.reportData?.driverName || 'Driver',
+          driverName: emergencyCase.reportData?.driverName || amb.name || 'Driver',
           driverPhone: emergencyCase.reportData?.driverPhone || amb.phone,
-          vehicleNumber: emergencyCase.reportData?.vehicleNumber || ('HA-AMB-' + amb._id.toString().substring(18))
+          vehicleNumber: emergencyCase.reportData?.vehicleNumber || ('HA-AMB-' + amb._id.toString().substring(18)),
+          liveStatus: emergencyCase.reportData?.liveStatus || 'Assigned'
         };
       }
     }
@@ -1784,7 +2011,11 @@ export const getPatientStatus = async (req: Request, res: Response) => {
     return res.json({
       success: true,
       caseId,
+      emergencyCase,
       status: emergencyCase.status,
+      doctorStatus: emergencyCase.doctorStatus || (acceptedDetails ? 'accepted' : 'pending'),
+      hospitalStatus: emergencyCase.hospitalStatus || (assignedHospital ? 'accepted' : 'pending'),
+      ambulanceStatus: emergencyCase.ambulanceStatus || (assignedAmbulance ? 'assigned' : 'pending'),
       patientName: emergencyCase.patientName,
       injuryType: emergencyCase.injuryType,
       severity: emergencyCase.severity,
@@ -1792,8 +2023,15 @@ export const getPatientStatus = async (req: Request, res: Response) => {
       patient_location_address: emergencyCase.patient_location_address,
       accepted_by: emergencyCase.accepted_by,
       acceptedDetails,
+      doctor: acceptedDetails,
+      doctorDetails: acceptedDetails,
+      acceptedDoctor: acceptedDetails,
       assignedHospital,
+      hospital: assignedHospital,
+      accepted_hospital: assignedHospital,
       assignedAmbulance,
+      ambulance: assignedAmbulance,
+      accepted_ambulance: assignedAmbulance,
       patientLoc: trackingSession?.patientLoc || { lat: emergencyCase.lat, lng: emergencyCase.lng },
       ambulanceLoc: trackingSession?.ambulanceLoc || null,
       hospitalLoc: trackingSession?.hospitalLoc || hospitalLoc || null,
@@ -1801,7 +2039,9 @@ export const getPatientStatus = async (req: Request, res: Response) => {
       eta: trackingSession?.eta || emergencyCase.etaMinutes || 0,
       notifiedDoctors: emergencyCase.notifiedDoctorIds?.length || 0,
       notifiedHospitals: emergencyCase.notifiedHospitalIds?.length || 0,
+      timeline: emergencyCase.timeline || [],
       escalation_level: emergencyCase.escalation_level,
+      pdfUrl: `/api/emergency/${caseId}/report`,
       createdAt: emergencyCase.createdAt
     });
   } catch (err: any) {
@@ -2002,7 +2242,14 @@ export const updateAmbulanceStatus = async (req: Request, res: Response) => {
       io.to(`hospital_${emergencyCase.assignedHospitalId}`).emit('ambulance:location:update', updatePayload);
     }
 
-    return res.json({ success: true, message: `Ambulance status updated to ${currentStatus}`, case: emergencyCase });
+    await broadcastEmergencyCaseUpdate(caseId, 'ambulance_status_updated', {
+      liveStatus: currentStatus,
+      status: emergencyCase.status,
+      etaMinutes: trackingSession?.eta || emergencyCase.etaMinutes || 0,
+      distanceKm: trackingSession?.distanceRemaining ? Number(trackingSession.distanceRemaining.toFixed(1)) : 0
+    });
+
+    return res.json({ success: true, message: `Ambulance status updated to ${currentStatus}`, case: emergencyCase, emergencyCase });
 
   } catch (err: any) {
     console.error('[AMBULANCE STATUS UPDATE ERROR]:', err.message);

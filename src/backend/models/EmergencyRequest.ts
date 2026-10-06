@@ -79,9 +79,22 @@ const EmergencyCaseSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now },
     reason: { type: String, default: '' }
   }],
+  timeline: [{
+    event: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    actorId: { type: String, default: null },
+    actorRole: { type: String, default: null },
+    details: { type: mongoose.Schema.Types.Mixed, default: {} }
+  }],
+  doctorStatus: { type: String, default: 'none' },
+  hospitalStatus: { type: String, default: 'none' },
+  ambulanceStatus: { type: String, default: 'none' },
+  requiredSpecializations: { type: [String], default: [] },
+  aiAnalysis: { type: mongoose.Schema.Types.Mixed, default: null },
   escalation_level: { type: Number, default: 0 },
-  createdAt: { type: Date, default: Date.now }
-}, { collection: 'emergency_requests' });
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+}, { collection: 'emergency_requests', timestamps: true });
 
 delete mongoose.models.EmergencyCase;
 export const EmergencyCase: mongoose.Model<any> = mongoose.model('EmergencyCase', EmergencyCaseSchema);
