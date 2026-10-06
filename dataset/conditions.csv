@@ -1,0 +1,9 @@
+condition,severity,description
+burn,HIGH,Damage to skin tissue caused by heat, radiation, electricity, or chemicals.
+cut,MEDIUM,A clean break or slit in the skin, typically caused by a sharp object.
+deep wound,CRITICAL,A deep laceration involving muscle, fat, or tendons, often with severe bleeding.
+bruise,MEDIUM,A dark discoloration of the skin caused by bleeding under the surface.
+fracture,HIGH,A complete or partial break in a bone, causing pain and deformity.
+skin rash,LOW,Inflammation, irritation, or swelling of the skin with spots or bumps.
+infection,HIGH,Bacterial or viral invasion causing redness, warmth, swelling, or pus.
+normal skin,LOW,Healthy, undamaged skin tissue with no signs of trauma or infection.

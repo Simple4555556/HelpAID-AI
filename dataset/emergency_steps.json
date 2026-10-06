@@ -1,0 +1,197 @@
+{
+  "accident": {
+    "title": "Accident Emergency",
+    "categories": [
+      {
+        "type": "safety",
+        "title": "Immediate Safety",
+        "steps": [
+          "Check if the area is safe",
+          "Control traffic if possible",
+          "Do not put yourself in danger",
+          "Alert nearby people",
+          "Secure the accident site"
+        ]
+      },
+      {
+        "type": "assessment",
+        "title": "Check Victim Condition",
+        "steps": [
+          "Check if victim is conscious",
+          "Check breathing",
+          "Check pulse",
+          "Look for bleeding",
+          "Observe body movement"
+        ]
+      },
+      {
+        "type": "help",
+        "title": "Call for Help",
+        "steps": [
+          "Call emergency number (112)",
+          "Ask nearby people for help",
+          "Call ambulance",
+          "Share clear location",
+          "Do not waste time"
+        ]
+      },
+      {
+        "type": "bleeding",
+        "title": "Control Bleeding",
+        "steps": [
+          "Apply pressure with clean cloth",
+          "Elevate wound if possible",
+          "Apply strong pressure if heavy bleeding",
+          "Do not remove object from wound",
+          "Bandage tightly"
+        ]
+      },
+      {
+        "type": "unconscious",
+        "title": "Handle Unconscious Victim",
+        "steps": [
+          "Do not move victim unnecessarily",
+          "Keep checking breathing",
+          "Clear airway",
+          "Place in recovery position",
+          "Support neck"
+        ]
+      },
+      {
+        "type": "cpr",
+        "title": "CPR (If Not Breathing)",
+        "steps": [
+          "Start CPR",
+          "Do chest compressions",
+          "Give mouth-to-mouth if trained",
+          "Follow 30:2 ratio",
+          "Continue until help arrives"
+        ]
+      },
+      {
+        "type": "fracture",
+        "title": "Fracture Handling",
+        "steps": [
+          "Do not move injured part",
+          "Provide support (splint)",
+          "Apply ice (not directly)",
+          "Reduce pain",
+          "Keep patient calm"
+        ]
+      },
+      {
+        "type": "burn",
+        "title": "Burn Case",
+        "steps": [
+          "Cool with running water",
+          "Do not apply ice",
+          "Cover with clean cloth",
+          "Do not burst blisters",
+          "Do not apply ointment without advice"
+        ]
+      },
+      {
+        "type": "shock",
+        "title": "Shock Prevention",
+        "steps": [
+          "Lay victim down",
+          "Elevate legs",
+          "Keep warm",
+          "Loosen tight clothes",
+          "Give water only if conscious"
+        ]
+      },
+      {
+        "type": "transport",
+        "title": "Transport & Final Care",
+        "steps": [
+          "Move patient safely",
+          "Keep spine straight",
+          "Reach hospital quickly",
+          "Provide full info to doctor",
+          "Stay calm"
+        ]
+      }
+    ]
+  },
+  "medical": {
+    "title": "Medical Emergency",
+    "categories": [
+      {
+        "type": "assessment",
+        "title": "Initial Assessment",
+        "steps": [
+          "Check surroundings for safety",
+          "Check responsiveness",
+          "Check breathing",
+          "Check pulse"
+        ]
+      },
+      {
+        "type": "help",
+        "title": "Emergency Call",
+        "steps": [
+          "Call 112 immediately",
+          "Share exact location",
+          "Explain condition clearly"
+        ]
+      },
+      {
+        "type": "airway",
+        "title": "Airway Management",
+        "steps": [
+          "Clear airway",
+          "Use head tilt-chin lift",
+          "Place in recovery position"
+        ]
+      },
+      {
+        "type": "cpr",
+        "title": "Cardiac Emergency",
+        "steps": [
+          "Start chest compressions",
+          "Maintain 100-120/min rate",
+          "Follow 30:2 ratio",
+          "Use AED if available"
+        ]
+      },
+      {
+        "type": "breathing",
+        "title": "Breathing Issues",
+        "steps": [
+          "Make patient sit upright",
+          "Help with inhaler",
+          "Stay calm and monitor"
+        ]
+      },
+      {
+        "type": "seizure",
+        "title": "Seizure Handling",
+        "steps": [
+          "Clear surrounding area",
+          "Protect head",
+          "Do not hold tightly",
+          "Wait until seizure stops"
+        ]
+      },
+      {
+        "type": "bleeding",
+        "title": "Severe Bleeding",
+        "steps": [
+          "Apply direct pressure",
+          "Use clean cloth",
+          "Elevate wound"
+        ]
+      },
+      {
+        "type": "final",
+        "title": "Final Care",
+        "steps": [
+          "Keep patient calm",
+          "Monitor continuously",
+          "Wait for medical help"
+        ]
+      }
+    ]
+  }
+}

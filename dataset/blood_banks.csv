@@ -1,0 +1,12 @@
+name,address,city,district,phone,lat,lng,bloodGroups,open24x7
+"District Hospital Blood Bank","Civil Lines","Unnao","Unnao","9000000023",26.5510,80.4930,"A+;B+;O+;AB+",true
+"Unnao Medical Centre Blood Bank","Lok Nagar","Unnao","Unnao","9000000027",26.5600,80.4800,"A+;B+;O+;O-;A-;B-",true
+"Blood Bank – Lala Lajpat Rai Hospital","Swaroop Nagar","Kanpur","Kanpur Nagar","9000000051",26.4800,80.3200,"A+;B+;O+;AB+;O-;A-;B-",true
+"Blood Bank – Ursula Hospital","Civil Lines","Kanpur","Kanpur Nagar","9000000052",26.4700,80.3400,"A+;B+;O+;AB+;O-",true
+"Blood Bank – Regency Hospital","Sarvodaya Nagar","Kanpur","Kanpur Nagar","9000000053",26.4800,80.3100,"A+;B+;O+;AB+;O-;A-;B-;AB-",true
+"Blood Bank – Rama Hospital","Kalyanpur","Kanpur","Kanpur Nagar","9000000054",26.5100,80.2400,"A+;B+;O+;AB+",true
+"KGMU Blood Bank","Chowk","Lucknow","Lucknow","9000000061",26.8700,80.9100,"A+;B+;O+;AB+;O-;A-;B-;AB-",true
+"SGPGI Blood Bank","Raebareli Road","Lucknow","Lucknow","9000000062",26.7800,80.9400,"A+;B+;O+;AB+;O-;A-;B-;AB-",true
+"Balrampur Blood Bank","Golaganj","Lucknow","Lucknow","9000000064",26.8600,80.9300,"A+;B+;O+;AB+;O-",true
+"Civil Hospital Blood Bank","Hazratganj","Lucknow","Lucknow","9000000065",26.8500,80.9400,"A+;B+;O+;AB+;O-;A-",true
+"Apollo Medics Blood Bank","Kanpur Road","Lucknow","Lucknow","9000000067",26.7900,80.9200,"A+;B+;O+;AB+;O-;A-;B-;AB-",true

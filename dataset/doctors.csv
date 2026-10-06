@@ -1,0 +1,21 @@
+name,specialization,hospital,clinic,phone,status,city,district,lat,lng
+"Dr. Ashok Kumar","General Physician","Unnao Medical Centre","","9100000001","Available","Unnao","Unnao",26.5500,80.4900
+"Dr. A.K. Singh","Orthopedic Specialist","Vidhi Super Speciality Hospital","","9100000002","Available","Unnao","Unnao",26.5520,80.4920
+"Dr. S.K. Gupta","Physician","District Hospital Unnao","","9100000003","Available","Unnao","Unnao",26.5510,80.4910
+"Dr. R.K. Mishra","Pediatrician","Unnao Medical Centre","","9100000004","Available","Unnao","Unnao",26.5490,80.4890
+"Dr. Anil Verma","General Medicine","SHREE SAI HOSPITAL","","9100000005","Available","Unnao","Unnao",26.5480,80.4880
+"Dr A Sharma","General Physician","Unnao Medical Centre","","9100000006","Available","Unnao","Unnao",26.5500,80.4900
+"Dr R Singh","Orthopedic","Vidhi Super Speciality Hospital","","9100000007","Available","Unnao","Unnao",26.5600,80.4900
+"Dr P Gupta","Pediatrician","Pushpa Hospital & Surgical Centre","","9100000008","Available","Unnao","Unnao",26.3700,80.6100
+"Dr K Verma","ENT","Sai Eye & ENT Hospital","","9100000009","Available","Unnao","Unnao",26.5500,80.5100
+"Dr S Mishra","General Medicine","Nawabganj Seva Hospital","","9100000010","Available","Nawabganj","Unnao",26.6200,80.3200
+"Dr. Renu Verma","Gynecology;Women's Health","Civil Hospital","","9100000011","Available","Lucknow","Lucknow",26.8500,80.9460
+"Dr. Amit Agarwal","Cardiology;Heart Care","Medanta Lucknow","","9100000012","Available","Lucknow","Lucknow",26.8502,81.0085
+"Dr. Pankaj Tiwari","General Physician","Dr. Ram Manohar Lohia Institute","","9100000013","Available","Lucknow","Lucknow",26.8850,80.9450
+"Dr. Rajesh Singh","Orthopedic;Bone & Joint Care","SGPGI Lucknow","","9100000014","Available","Lucknow","Lucknow",26.8900,81.0000
+"Dr. Neha Sharma","Pediatrics;Child Care","Apollo Medics","","9100000015","Available","Lucknow","Lucknow",26.8000,80.9000
+"Dr. Vivek Gupta","ENT Specialist","KGMU Lucknow","","9100000016","Available","Lucknow","Lucknow",26.8330,80.9230
+"Dr. S. K. Mishra","General Medicine","King George's Medical University","","9100000017","Available","Lucknow","Lucknow",26.8700,80.9100
+"Dr. Ashish Verma","Dermatology","Balrampur Hospital","","9100000018","Available","Lucknow","Lucknow",26.8450,80.9200
+"Dr. Priya Singh","Gynecology","Medanta Lucknow","","9100000019","Available","Lucknow","Lucknow",26.8510,81.0100
+"Dr. Manoj Kumar","Neurology","SGPGI Lucknow","","9100000020","Available","Lucknow","Lucknow",26.8510,80.9455

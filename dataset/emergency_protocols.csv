@@ -1,0 +1,9 @@
+condition,severity,protocol,ambulanceRequired
+burn,HIGH,If burn is large or on face/hands, seek emergency room attention.,true
+cut,MEDIUM,Consult a physician if cut is deep or requires stitches.,false
+deep wound,CRITICAL,Call 108 immediately. Keep pressure applied to control bleeding.,true
+bruise,MEDIUM,Monitor for extreme swelling. If severe pain persists, consult a clinic.,false
+fracture,HIGH,Avoid movement. Call emergency services to transport safely.,true
+skin rash,LOW,Visit a doctor if rash spreads quickly or is accompanied by fever.,false
+infection,HIGH,Seek prompt medical consultation to prevent spread into bloodstream.,false
+normal skin,LOW,No emergency protocol needed. Monitor for changes.,false

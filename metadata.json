@@ -1,0 +1,9 @@
+{
+  "name": "RescueLink: Emergency Response AI",
+  "description": "A high-speed emergency response platform featuring one-click SOS, AI symptom checking, nearby help locator, and first aid guides.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}

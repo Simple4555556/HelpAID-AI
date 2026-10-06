@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "userProfile": {
+      "title": "User Profile",
+      "description": "Stores user medical information and emergency contacts.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name of the user" },
+        "email": { "type": "string", "format": "email", "description": "User email address" },
+        "phone": { "type": "string", "description": "Primary phone number" },
+        "medicalInfo": { "type": "string", "description": "Allergies, blood type, etc." },
+        "emergencyContacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "phone": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["name", "email"]
+    },
+    "emergencyLog": {
+      "title": "Emergency Log",
+      "description": "Logs SOS alerts and symptom checker results.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the user who triggered the alert" },
+        "type": { "type": "string", "enum": ["SOS", "SYMPTOM_CHECKER"], "description": "Type of emergency" },
+        "location": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          }
+        },
+        "status": { "type": "string", "enum": ["ACTIVE", "RESOLVED"], "description": "Current status of the alert" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the alert was triggered" },
+        "symptomResult": { "type": "string", "description": "AI generated symptom analysis" }
+      },
+      "required": ["userId", "type", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "userProfile",
+      "description": "User profiles and medical data."
+    },
+    "/emergencies/{emergencyId}": {
+      "schema": "emergencyLog",
+      "description": "Logs of all emergency events."
+    }
+  }
+}

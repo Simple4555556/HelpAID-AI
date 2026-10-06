@@ -1,0 +1,12 @@
+symptom,age,gender,pain_level,duration,additional_symptoms,severity,possible_condition,recommended_action
+chest_pain,45,male,8,30 min,left arm pain,severe,heart_attack,emergency
+chest_pain,22,female,3,1 hr,gas,low,acidity,home_care
+fever,18,male,4,1 day,body pain,medium,viral_fever,rest_and_medicine
+fever,30,female,6,3 days,cough,high,infection,doctor_consult
+headache,25,male,5,2 hr,stress,medium,migraine,rest
+headache,50,female,9,sudden,blurred vision,severe,stroke_risk,emergency
+shortness_of_breath,60,male,9,15 min,chest pain,severe,heart_issue,emergency
+stomach_ache,20,female,4,3 hr,bloating,low,gas,home_care
+skin_rash,16,male,2,1 day,itching,low,allergy,cream
+dizziness,35,female,5,30 min,low bp,medium,hypotension,rest
+injury,28,male,7,immediate,bleeding,severe,cut_wound,first_aid

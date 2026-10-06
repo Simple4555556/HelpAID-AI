@@ -1,0 +1,25 @@
+HelpAid AI - Privacy Policy
+Last Updated: June 7, 2026
+
+At HelpAid AI, we prioritize the privacy and security of your personal and medical information. This policy outlines how we collect, store, and process your data.
+
+1. Data Collection
+We collect the following information when you create a profile, save emergency contacts, check symptoms, or upload injury photos:
+- Identity Information: Name, Age, Gender.
+- Contact Details: Mobile Number, Email Address.
+- Medical Information: Allergies, chronic diseases, previous injuries, active medications, and notes.
+- Geolocation Coordinates: Used only in emergency SOS or location-based hospital searches with explicit user consent.
+- Diagnostic Records: Symptoms check records, Gemini-analyzed injury scans, and AI Doctor chat transcripts.
+
+2. Data Storage & Encryption
+- All medical data is stored securely in Firebase Firestore and MongoDB collections, which utilize role-based access rules.
+- Local in-memory fallbacks are used when database instances are unreachable, keeping logs confined to the client session.
+- Diagnostic PDFs generated for doctors are compiled securely on the fly.
+
+3. HIPAA & Medical Standards
+- Although HelpAid AI is a first-response triage tool and not a clinical diagnosis system, we adopt HIPAA-compliant security patterns including encryption of data in transit and at rest.
+- We do not share your profile with third-party networks without your express sharing commands (e.g., "Share with Doctor" or "Send SOS").
+
+4. User Rights
+- You can access, review, modify, or completely delete your HelpAid Profile at any time from your Secure Vault.
+- If you have any inquiries regarding your medical data, contact our support team at privacy@helpaid.com.

@@ -1,0 +1,44 @@
+name,type,address,city,district,state,pincode,phone,status,services,lat,lng
+"Shri Dhanwantri Ayurvedic Medical College & Research Centre","hospital","Semri, Chhata, Mathura","Chhata","Mathura","Uttar Pradesh","281401","+91 9266949411","Open 24/7","Ayurvedic Treatment;OPD;Emergency Care",27.7280,77.5120
+"KD Medical College & Hospital","hospital","Akbarpur, NH-2, Chhata","Chhata","Mathura","Uttar Pradesh","281401","07055502242","Open 24/7","Emergency;ICU;Surgery;General Medicine",27.7167,77.5000
+"Gopi Krishna Hospital","hospital","Chhata, Mathura","Chhata","Mathura","Uttar Pradesh","281401","Local availability","Open 24/7","General Treatment;Emergency",27.7230,77.5040
+"Jeevan Jyoti Hospital Trauma Centre","hospital","Chhata, Mathura","Chhata","Mathura","Uttar Pradesh","281401","09266949411","Open 24/7","Trauma Care;Emergency",27.7200,77.5100
+"Sunayan Eye Centre","hospital","Krishna Nagar, Mathura","Mathura","Mathura","Uttar Pradesh","281001","08488077502","Open 24/7","Eye Surgery;Vision Care",27.4950,77.6750
+"City Institute of Medical Sciences (CIMS)","hospital","Masani Road, Mathura","Mathura","Mathura","Uttar Pradesh","281001","09258113570","Open 24/7","ICU;Emergency;Multi-speciality",27.5100,77.6800
+"Apollo Diagnostic Clinic","hospital","NH-2, Bypass Road","Chhata","Mathura","Uttar Pradesh","281401","8171015325","Open 24/7","Diagnostic;Emergency",27.7150,77.5050
+"Nawabganj Seva Hospital","hospital","Kanpur-Lucknow Bypass Road, Nawabganj","Nawabganj","Unnao","Uttar Pradesh","209859","9000000021","Open 24/7","General Medicine;Emergency Care",26.6200,80.3200
+"Muskan Hospital","hospital","Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000022","Open","General Medicine;Emergency",26.5500,80.4900
+"SHREE SAI HOSPITAL","hospital","Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000023","Open","General Treatment;Emergency",26.5500,80.4800
+"Vidhi Super Speciality Hospital","hospital","Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000024","Open 24/7","Multi Speciality;ICU;Emergency",26.5600,80.4900
+"Lata Healthcare Multi Superspeciality Hospital","hospital","Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000025","Open 24/7","Multi Speciality;Emergency",26.5500,80.5000
+"Ayra Hospital","hospital","Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000026","Open","General Medicine;Emergency",26.5400,80.4900
+"Unnao Medical Centre","hospital","Lok Nagar, Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000027","Open 24/7","Emergency;General Medicine",26.5600,80.4800
+"Sai Eye & ENT Hospital","hospital","Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000028","Open","Eye Care;ENT",26.5500,80.5100
+"Surgical Hospital and Trauma Centre","hospital","Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000029","Open 24/7","Trauma Care;Surgery;Emergency",26.5400,80.5000
+"Pushpa Hospital & Surgical Centre","hospital","Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000030","Open","Surgery;General Medicine",26.3700,80.6100
+"District Hospital Unnao","hospital","Civil Lines, Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000041","Open 24/7","General Medicine;Emergency;Pediatrics;Orthopedics",26.5510,80.4930
+"Community Health Centre (CHC) Safipur","hospital","Safipur, Unnao","Safipur","Unnao","Uttar Pradesh","209203","9000000042","Open 24/7","Primary Care;Emergency;Maternity",26.7400,80.3400
+"Community Health Centre (CHC) Bangarmau","hospital","Bangarmau, Unnao","Bangarmau","Unnao","Uttar Pradesh","209869","9000000043","Open 24/7","Primary Care;Emergency;General Medicine",26.8900,80.2100
+"Community Health Centre (CHC) Purwa","hospital","Purwa, Unnao","Purwa","Unnao","Uttar Pradesh","209825","9000000044","Open 24/7","Primary Care;Emergency;Maternity",26.5800,80.5200
+"Community Health Centre (CHC) Bighapur","hospital","Bighapur, Unnao","Bighapur","Unnao","Uttar Pradesh","209506","9000000045","Open 24/7","Primary Care;Emergency",26.3700,80.6100
+"Community Health Centre (CHC) Hasanganj","hospital","Hasanganj, Unnao","Hasanganj","Unnao","Uttar Pradesh","209841","9000000046","Open 24/7","Primary Care;Emergency",26.7500,80.4100
+"Community Health Centre (CHC) Nawabganj","hospital","Nawabganj, Unnao","Nawabganj","Unnao","Uttar Pradesh","209859","9000000047","Open 24/7","Primary Care;Emergency",26.6200,80.3200
+"Lala Lajpat Rai Hospital (Hallet Hospital)","hospital","Swaroop Nagar, Kanpur","Kanpur","Kanpur Nagar","Uttar Pradesh","208002","9000000051","Open 24/7","Trauma Care;Emergency;Multi Speciality;Surgery",26.4800,80.3200
+"Ursula Horsman Memorial Hospital","hospital","Civil Lines, Kanpur","Kanpur","Kanpur Nagar","Uttar Pradesh","208001","9000000052","Open 24/7","Emergency;General Medicine;Outpatient",26.4700,80.3400
+"Regency Hospital","hospital","Sarvodaya Nagar, Kanpur","Kanpur","Kanpur Nagar","Uttar Pradesh","208005","9000000053","Open 24/7","Multi Speciality;ICU;Emergency;Cardiology",26.4800,80.3100
+"Rama Medical College Hospital and Research Centre","hospital","Kalyanpur, Kanpur","Kanpur","Kanpur Nagar","Uttar Pradesh","208017","9000000054","Open 24/7","Multi Speciality;Emergency;General Medicine;ICU",26.5100,80.2400
+"Madhuraj Hospital","hospital","Swaroop Nagar, Kanpur","Kanpur","Kanpur Nagar","Uttar Pradesh","208002","9000000055","Open 24/7","Emergency;Maternity;Surgery",26.4700,80.3300
+"Kulwanti Hospitals & Research Centre","hospital","Saket Nagar, Kanpur","Kanpur","Kanpur Nagar","Uttar Pradesh","208014","9000000056","Open 24/7","ICU;Surgery;Emergency;Diagnostics",26.4800,80.3200
+"Excel Hospital","hospital","Sharda Nagar, Kanpur","Kanpur","Kanpur Nagar","Uttar Pradesh","208025","9000000057","Open 24/7","Multi Speciality;Orthopedics;Emergency",26.4500,80.2900
+"Naraina Medical College & Hospital","hospital","Panki, Kanpur","Kanpur","Kanpur Nagar","Uttar Pradesh","208020","9000000058","Open 24/7","Emergency;ICU;Surgery;General Medicine",26.4600,80.2200
+"GSVM Medical College","hospital","Swaroop Nagar, Kanpur","Kanpur","Kanpur Nagar","Uttar Pradesh","208002","9000000059","Open 24/7","Emergency;Multi Speciality;Surgery;ICU",26.4800,80.3200
+"King George's Medical University","hospital","Chowk, Lucknow","Lucknow","Lucknow","Uttar Pradesh","226003","9000000061","Open 24/7","Emergency;Trauma Care;Multi Speciality;Surgery;ICU",26.8700,80.9100
+"Sanjay Gandhi Postgraduate Institute of Medical Sciences","hospital","Raebareli Road, Lucknow","Lucknow","Lucknow","Uttar Pradesh","226014","9000000062","Open 24/7","Super Speciality;Cardiology;Neurology;Emergency",26.7800,80.9400
+"Dr. Ram Manohar Lohia Institute of Medical Sciences","hospital","Vibhuti Khand, Gomti Nagar, Lucknow","Lucknow","Lucknow","Uttar Pradesh","226010","9000000063","Open 24/7","Multi Speciality;Emergency;Oncology;ICU",26.8600,80.9900
+"Balrampur Hospital","hospital","Golaganj, Lucknow","Lucknow","Lucknow","Uttar Pradesh","226018","9000000064","Open 24/7","General Medicine;Emergency;Maternity;Outpatient",26.8600,80.9300
+"Civil Hospital","hospital","Hazratganj, Lucknow","Lucknow","Lucknow","Uttar Pradesh","226001","9000000065","Open 24/7","Emergency;Outpatient;General Medicine",26.8500,80.9400
+"Medanta Lucknow","hospital","Sector 7, Amar Shaheed Path, Lucknow","Lucknow","Lucknow","Uttar Pradesh","226030","9000000066","Open 24/7","Multi Speciality;Cardiology;ICU;Emergency",26.7800,81.0100
+"Apollo Medics Super Speciality Hospital","hospital","Kanpur Road, Lucknow","Lucknow","Lucknow","Uttar Pradesh","226012","9000000067","Open 24/7","Multi Speciality;ICU;Emergency;Cardiology;Neurology",26.7900,80.9200
+"Mayo Medical Centre","hospital","Vikas Nagar, Lucknow","Lucknow","Lucknow","Uttar Pradesh","226022","9000000068","Open 24/7","Multi Speciality;Emergency;General Treatment",26.8700,81.0000
+"Ansh Poly Clinic","clinic","Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000031","Open","Outpatient Services",26.5500,80.4700
+"Azad Health Center","clinic","Unnao","Unnao","Unnao","Uttar Pradesh","209801","9000000032","Open","Primary Healthcare",26.5600,80.4700

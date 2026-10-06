@@ -1,0 +1,61 @@
+Disease,Symptoms,Precautions,Medicines,Steps,ImageURL
+Flu,"fever,cough,headache","rest,hydration","paracetamol","rest,drink fluids,take medicine","https://source.unsplash.com/featured/?flu"
+Migraine,"headache,nausea","avoid light,rest","ibuprofen","rest in dark room,take medicine,avoid noise","https://source.unsplash.com/featured/?migraine"
+Food Poisoning,"nausea,diarrhea","ORS,hydration","ORS","drink ORS,rest,avoid solid food","https://source.unsplash.com/featured/?food-poisoning"
+Fever,"fever,headache","rest,hydration","paracetamol","take rest,drink fluids,use cool cloth","https://source.unsplash.com/featured/?fever"
+
+Common Cold,"cough,sneezing","rest,fluids","antihistamine","drink warm fluids,rest,take medicine","https://source.unsplash.com/featured/?cold"
+Allergy,"sneezing,itching","avoid allergens","antihistamine","avoid triggers,take medicine,clean area","https://source.unsplash.com/featured/?allergy"
+Asthma,"shortness of breath","avoid triggers","inhaler","use inhaler,stay calm,avoid dust","https://source.unsplash.com/featured/?asthma"
+Bronchitis,"cough,fatigue","rest,fluids","cough syrup","rest,drink fluids,take syrup","https://source.unsplash.com/featured/?bronchitis"
+
+Diabetes,"fatigue,urination","diet control","metformin","monitor sugar,follow diet,take medicine","https://source.unsplash.com/featured/?diabetes"
+Hypertension,"headache,dizziness","reduce salt","amlodipine","reduce stress,monitor BP,take medicine","https://source.unsplash.com/featured/?blood-pressure"
+Anemia,"fatigue,pale skin","iron diet","iron supplements","eat iron foods,take supplements,rest","https://source.unsplash.com/featured/?anemia"
+Thyroid,"weight change","checkup","thyroxine","take medicine,regular checkup,balanced diet","https://source.unsplash.com/featured/?thyroid"
+
+Malaria,"fever,chills","mosquito protection","antimalarial","take medicine,rest,avoid mosquitoes","https://source.unsplash.com/featured/?malaria"
+Dengue,"fever,joint pain","hydration","paracetamol","drink fluids,rest,monitor platelets","https://source.unsplash.com/featured/?dengue"
+Typhoid,"fever,weakness","clean food","antibiotics","take antibiotics,rest,drink fluids","https://source.unsplash.com/featured/?typhoid"
+
+COVID-19,"fever,cough","isolation","paracetamol","isolate,rest,monitor oxygen","https://source.unsplash.com/featured/?covid"
+Pneumonia,"cough,breathing issue","rest","antibiotics","take medicine,rest,seek doctor","https://source.unsplash.com/featured/?pneumonia"
+Tuberculosis,"cough,weight loss","treatment","antibiotics","follow treatment,rest,avoid spread","https://source.unsplash.com/featured/?tuberculosis"
+
+Skin Allergy,"rash,itching","avoid irritants","antihistamine","clean area,apply cream,avoid scratching","https://source.unsplash.com/featured/?skin-rash"
+Eczema,"dry skin","moisturize","cream","apply cream,keep skin moist,avoid irritants","https://source.unsplash.com/featured/?eczema"
+Psoriasis,"skin patches","skin care","ointment","apply ointment,avoid stress,clean skin","https://source.unsplash.com/featured/?psoriasis"
+
+Acidity,"burning chest","avoid spicy food","antacid","avoid spicy food,take antacid,rest","https://source.unsplash.com/featured/?acidity"
+Gastritis,"stomach pain","light diet","antacid","eat light food,take medicine,rest","https://source.unsplash.com/featured/?gastritis"
+Ulcer,"stomach burning","avoid alcohol","antacid","avoid alcohol,take medicine,rest","https://source.unsplash.com/featured/?ulcer"
+
+Kidney Stone,"side pain","hydration","pain reliever","drink water,take medicine,seek doctor","https://source.unsplash.com/featured/?kidney-stone"
+UTI,"burning urination","hydration","antibiotics","drink water,take antibiotics,rest","https://source.unsplash.com/featured/?uti"
+
+Depression,"sadness,fatigue","therapy","antidepressant","talk to someone,therapy,medication","https://source.unsplash.com/featured/?depression"
+Anxiety,"panic,restlessness","relaxation","therapy","practice breathing,relax,seek help","https://source.unsplash.com/featured/?anxiety"
+
+Arthritis,"joint pain","exercise","pain reliever","exercise,take medicine,rest","https://source.unsplash.com/featured/?arthritis"
+Back Pain,"back pain","rest","pain reliever","rest,apply heat,exercise","https://source.unsplash.com/featured/?back-pain"
+
+Sinusitis,"headache,pressure","steam","decongestant","steam inhale,rest,take medicine","https://source.unsplash.com/featured/?sinus"
+Ear Infection,"ear pain","clean ear","antibiotics","avoid water,take medicine,rest","https://source.unsplash.com/featured/?ear"
+
+Eye Infection,"redness,itching","clean eyes","eye drops","wash eyes,use drops,avoid touching","https://source.unsplash.com/featured/?eye"
+Conjunctivitis,"red eye","avoid contact","eye drops","clean eye,use drops,avoid contact","https://source.unsplash.com/featured/?eye-red"
+
+Chickenpox,"rash,fever","isolation","antihistamine","rest,avoid scratching,stay isolated","https://source.unsplash.com/featured/?chickenpox"
+Measles,"rash,fever","rest","vitamins","rest,hydration,avoid contact","https://source.unsplash.com/featured/?measles"
+
+Obesity,"weight gain","exercise","diet control","exercise,balanced diet,monitor weight","https://source.unsplash.com/featured/?obesity"
+Heart Disease,"chest pain","healthy lifestyle","aspirin","seek doctor,avoid stress,healthy diet","https://source.unsplash.com/featured/?heart"
+
+Stroke,"weakness","emergency care","aspirin","call emergency,keep calm,monitor patient","https://source.unsplash.com/featured/?stroke"
+Epilepsy,"seizures","avoid triggers","anticonvulsant","protect head,stay calm,seek doctor","https://source.unsplash.com/featured/?epilepsy"
+
+Dehydration,"dry mouth","drink water","ORS","drink fluids,rest,avoid heat","https://source.unsplash.com/featured/?dehydration"
+Heat Stroke,"high temp","cool body","ORS","move to shade,cool body,drink fluids","https://source.unsplash.com/featured/?heat"
+
+Cold,"cough,sneezing","rest","antihistamine","rest,drink fluids,take medicine","https://source.unsplash.com/featured/?cold"
+Fatigue,"tiredness","rest","vitamins","sleep well,rest,balanced diet","https://source.unsplash.com/featured/?fatigue"

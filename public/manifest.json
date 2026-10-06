@@ -1,0 +1,18 @@
+{
+  "name": "HelpAid AI – Emergency First Response & Smart Health Assistance Platform",
+  "short_name": "HelpAid AI",
+  "description": "AI-powered healthcare assistant for emergencies, first aid, symptom checking, and locator services.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#2563eb",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

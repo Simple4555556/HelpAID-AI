@@ -1,0 +1,15 @@
+name,type,address,distance_km,phone,status,services,lat,lng
+"Shri Dhanwantri Ayurvedic Medical College & Research Centre","hospital","Semri, Chhata, Mathura",1.84,"+91 9266949411","Open 24/7","Ayurvedic Treatment;OPD;Emergency Care",27.7280,77.5120
+"KD Medical College & Hospital","hospital","Akbarpur, NH-2, Chhata",4.5,"07055502242","Open 24/7","Emergency;ICU;Surgery;General Medicine",27.7167,77.5000
+"Gopi Krishna Hospital","hospital","Chhata, Mathura",2.5,"Local availability","Open 24/7","General Treatment;Emergency",27.7230,77.5040
+"Jeevan Jyoti Hospital Trauma Centre","hospital","Chhata, Mathura",3.2,"09266949411","Open 24/7","Trauma Care;Emergency",27.7200,77.5100
+"Sunayan Eye Centre","hospital","Krishna Nagar, Mathura",5.0,"08488077502","Open 24/7","Eye Surgery;Vision Care",27.4950,77.6750
+"City Institute of Medical Sciences (CIMS)","hospital","Masani Road, Mathura",18.0,"09258113570","Open 24/7","ICU;Emergency;Multi-speciality",27.5100,77.6800
+"Apollo Diagnostic Clinic","hospital","NH-2, Bypass Road",4.2,"8171015325","Open 24/7","Diagnostic;Emergency",27.7150,77.5050
+"City Police Station","police","Main Market, Chhata",0.8,"100","Active 24/7","Emergency Support;Public Safety",27.7250,77.5050
+"Highway Patrol Post","police","Kosi Kalan, Mathura",12.5,"112","Active 24/7","Highway Safety;Accident Support",27.7850,77.4250
+"Apollo Pharmacy","pharmacy","Railway Road, Chhata",1.5,"8171015325","Open","General Medicines;First Aid;Wellness",27.7220,77.5080
+"Jeevan Pharmacy","pharmacy","Highway Crossing",3.1,"9266949411","Open 24/7","24hr Meds;Emergency Kits",27.7180,77.5020
+"SafeMed Pharmacist","pharmacy","Civil Lines, Mathura",22.0,"05652400000","Open","Prescription;OTC;Vaccines",27.4924,77.6737
+"Mathura Blood Bank","blood","Civil Lines, Mathura",12.0,"0565-2400000","Available","O+;B+;Plasma;Platelets",27.4924,77.6737
+"Red Cross Blood Centre","blood","Highway Road, Mathura",15.5,"05652410000","Available","All Blood Groups;Emergency Delivery",27.5150,77.6650
