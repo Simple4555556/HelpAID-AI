@@ -53,6 +53,8 @@ import apiRouter from './src/backend/routes/api.js';
 
 dotenv.config();
 
+const PORT = process.env.PORT || 5000;
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const upload = multer({ limits: { fileSize: 10 * 1024 * 1024 } });
