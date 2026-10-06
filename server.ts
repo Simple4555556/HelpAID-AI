@@ -530,8 +530,20 @@ io.on('connection', (socket) => {
         distanceKm: Number(distanceRemaining.toFixed(1)),
         etaMinutes: eta
       };
+      // Broadcast to case, emergency room, user, and guest rooms
       io.to(`case_${data.caseId}`).emit('doctor:location:update', payload);
-      console.log('[SOCKET EMITTED] Emit doctor:location:update:', JSON.stringify(payload));
+      io.to(`case_${data.caseId}`).emit('doctor_location_updated', payload);
+      io.to(`emergency:${data.caseId}`).emit('doctor:location:update', payload);
+      io.to(`emergency:${data.caseId}`).emit('doctor_location_updated', payload);
+      if (emergencyCase?.userId) {
+        io.to(`user_${emergencyCase.userId}`).emit('doctor:location:update', payload);
+        io.to(`user_${emergencyCase.userId}`).emit('doctor_location_updated', payload);
+      }
+      if (emergencyCase?.guestSessionId) {
+        io.to(`guest_${emergencyCase.guestSessionId}`).emit('doctor:location:update', payload);
+        io.to(`guest_${emergencyCase.guestSessionId}`).emit('doctor_location_updated', payload);
+      }
+      console.log('[SOCKET EMITTED] Emit doctor:location:update & doctor_location_updated:', JSON.stringify(payload));
     } catch (err: any) {
       console.warn('[Socket] Doctor location update failed:', err.message);
     }
@@ -1062,6 +1074,7 @@ Guidelines:
           config: {
             systemInstruction: `You are an expert emergency medical assistant AI. Analyze the image to detect injuries and provide detailed triage. Return JSON matching the schema.`,
             responseMimeType: 'application/json',
+            thinkingConfig: { thinkingBudget: 0 },
             responseSchema: {
               type: Type.OBJECT,
               properties: {
