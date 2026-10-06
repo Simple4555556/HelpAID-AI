@@ -1,9 +1,44 @@
+# Dependencies
 node_modules/
-build/
+.pnp
+.pnp.js
+
+# Build outputs
 dist/
+build/
 coverage/
-.DS_Store
-*.log
+
+# Environment and Secrets (CRITICAL: Never commit real keys/tokens)
 .env*
 !.env.example
 firebase-applet-config.json
+*.pem
+*.key
+*.cert
+
+# Python & ML Cache
+__pycache__/
+*.py[cod]
+*$py.class
+ml_service/__pycache__/
+.pytest_cache/
+
+# Logs & Temporary Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+scratch/
+replace_urls.cjs
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

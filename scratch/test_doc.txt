@@ -1,4 +1,0 @@
-This is a simulated cardiac blood test report for HelpAid AI Medical Vault verification.
-Patient: Rahul Sharma
-Date: 2026-06-08
-Status: Normal
